@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#3B82F6">
+    <title>Event Tracker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #F5F7FA;
+            min-height: 100vh;
+            padding: 15px;
+            padding-bottom: 30px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 25px;
+            padding-top: 10px;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1F2937;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            font-size: 13px;
+            color: #6B7280;
+        }
+
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            border: 1px solid #E5E7EB;
+        }
+
+        .voice-card {
+            background: linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%);
+            border: 2px solid #3B82F6;
+            text-align: center;
+        }
+
+        .voice-icon {
+            font-size: 40px;
+            margin-bottom: 12px;
+        }
+
+        .voice-card h2 {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1F2937;
+            margin-bottom: 8px;
+        }
+
+        .voice-card p {
+            font-size: 13px;
+            color: #6B7280;
+            margin-bottom: 20px;
+        }
+
+        .btn-voice {
+            background: linear-gradient(135deg, #3B82F6 0%, #06B6D4 100%);
+            color: white;
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            font-size: 28px;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+            transition: all 0.3s;
+        }
+
+        .btn-voice:active {
+            transform: scale(0.95);
+        }
+
+        .btn-voice.recording {
+            background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
+            animation: pulse 1.5s infinite;
+            box-shadow: 0 4px 16px rgba(239, 68, 68, 0.5);
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.08); }
+        }
+
+        .status-text {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            display: none;
+        }
+
+        .status-listening {
+            background: #DBEAFE;
+            color: #1E40AF;
+            display: block;
+        }
+
+        .status-success {
+            background: #D1FAE5;
+            color: #065F46;
+            display: block;
+        }
+
+        .status-error {
+            background: #FEE2E2;
+            color: #991B1B;
+            display: block;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #E5E7EB;
+            border-radius: 12px;
+            font-size: 16px;
+            resize: vertical;
+            min-height: 80px;
+            font-family: inherit;
+            margin-bottom: 12px;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #3B82F6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: #10B981;
+            color: white;
+        }
+
+        .btn-primary:active {
+            background: #059669;
+            transform: scale(0.98);
+        }
+
+        .search-container {
+            margin-bottom: 15px;
+        }
+
+        .search-box {
+            display: flex;
+            gap: 10px;
+        }
+
+        .search-box input {
+            flex: 1;
+            padding: 15px;
+            border: 2px solid #E5E7EB;
+            border-radius: 12px;
+            font-size: 16px;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: #3B82F6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .btn-search {
+            padding: 15px 20px;
+            background: #3B82F6;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 18px;
+            cursor: pointer;
+        }
+
+        .btn-search:active {
+            background: #2563EB;
+        }
+
+        .stats {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .stat-card {
+            flex: 1;
+            background: linear-gradient(135deg, #3B82F6 0%, #06B6D4 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            opacity: 0.9;
+        }
+
+        .event-list {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .event-item {
+            background: #F9FAFB;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-left: 4px solid #3B82F6;
+        }
+
+        .event-date {
+            font-size: 12px;
+            color: #6B7280;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .event-description {
+            font-size: 14px;
+            color: #1F2937;
+            margin-bottom: 10px;
+            line-height: 1.5;
+        }
+
+        .event-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 8px;
+        }
+
+        .tag {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .tag-person {
+            background: #DBEAFE;
+            color: #1E40AF;
+        }
+
+        .tag-place {
+            background: #D1FAE5;
+            color: #065F46;
+        }
+
+        .tag-food {
+            background: #FEE2E2;
+            color: #991B1B;
+        }
+
+        .btn-delete {
+            background: #EF4444;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .btn-delete:active {
+            background: #DC2626;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #6B7280;
+        }
+
+        .empty-icon {
+            font-size: 48px;
+            margin-bottom: 12px;
+            opacity: 0.5;
+        }
+
+        .label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .clear-btn {
+            background: #F3F4F6;
+            color: #6B7280;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            cursor: pointer;
+            margin-top: 10px;
+            font-weight: 600;
+        }
+
+        .clear-btn:active {
+            background: #E5E7EB;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📅 Event Tracker</h1>
+        <p>Quick voice notes for your events</p>
+    </div>
+
+    <!-- Voice Input Card -->
+    <div class="card voice-card">
+        <div class="voice-icon">🎤</div>
+        <h2>Voice Input</h2>
+        <p>Tap to speak your event</p>
+        <button class="btn-voice" id="voiceBtn" onclick="startVoiceRecording()">🎤</button>
+        <div id="voiceStatus" class="status-text"></div>
+    </div>
+
+    <!-- Text Input Card -->
+    <div class="card">
+        <label class="label">Or Type It</label>
+        <textarea id="eventInput"></textarea>
+        <button class="btn btn-primary" onclick="saveEvent()">💾 Save Event</button>
+    </div>
+
+    <!-- Search Card -->
+    <div class="card">
+        <label class="label">Search Events</label>
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="Search...">
+            <button class="btn-search" onclick="searchEvents()">🔍</button>
+        </div>
+        <button class="clear-btn" onclick="showAllEvents()">Show All</button>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats">
+        <div class="stat-card">
+            <div class="stat-number" id="totalEvents">0</div>
+            <div class="stat-label">TOTAL</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number" id="monthEvents">0</div>
+            <div class="stat-label">THIS MONTH</div>
+        </div>
+    </div>
+
+    <!-- Events List -->
+    <div class="card">
+        <label class="label">Your Events</label>
+        <div class="event-list" id="eventList">
+            <div class="empty-state">
+                <div class="empty-icon">📝</div>
+                <p>No events yet<br>Start adding!</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let events = [];
+        let recognition = null;
+        let isRecording = false;
+
+        // Initialize Speech Recognition
+        function initSpeechRecognition() {
+            try {
+                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                
+                if (!SpeechRecognition) {
+                    showStatus('Voice not supported. Please type instead.', 'error');
+                    return false;
+                }
+
+                recognition = new SpeechRecognition();
+                recognition.lang = 'en-US';
+                recognition.continuous = false;
+                recognition.interimResults = false;
+                recognition.maxAlternatives = 1;
+
+                recognition.onstart = () => {
+                    isRecording = true;
+                    document.getElementById('voiceBtn').classList.add('recording');
+                    showStatus('🎤 Listening... Speak now!', 'listening');
+                };
+
+                recognition.onresult = (event) => {
+                    const transcript = event.results[0][0].transcript;
+                    document.getElementById('eventInput').value = transcript;
+                    showStatus('✅ Got it! Tap Save.', 'success');
+                    setTimeout(() => hideStatus(), 2000);
+                };
+
+                recognition.onerror = (event) => {
+                    console.error('Speech recognition error:', event.error);
+                    let errorMsg = 'Error occurred. Try again.';
+                    
+                    if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
+                        errorMsg = 'Microphone access denied. Enable in settings.';
+                    } else if (event.error === 'no-speech') {
+                        errorMsg = 'No speech detected. Try again.';
+                    } else if (event.error === 'network') {
+                        errorMsg = 'Network error. Check connection.';
+                    }
+                    
+                    showStatus(errorMsg, 'error');
+                    stopRecording();
+                    setTimeout(() => hideStatus(), 3000);
+                };
+
+                recognition.onend = () => {
+                    stopRecording();
+                };
+
+                return true;
+            } catch (error) {
+                console.error('Speech recognition init error:', error);
+                showStatus('Voice not available. Please type.', 'error');
+                return false;
+            }
+        }
+
+        function startVoiceRecording() {
+            if (!recognition && !initSpeechRecognition()) {
+                return;
+            }
+
+            if (isRecording) {
+                recognition.stop();
+                return;
+            }
+
+            try {
+                recognition.start();
+            } catch (error) {
+                console.error('Error starting recognition:', error);
+                showStatus('Error starting voice. Try again.', 'error');
+                setTimeout(() => hideStatus(), 2000);
+            }
+        }
+
+        function stopRecording() {
+            isRecording = false;
+            document.getElementById('voiceBtn').classList.remove('recording');
+        }
+
+        function showStatus(message, type) {
+            const statusEl = document.getElementById('voiceStatus');
+            statusEl.textContent = message;
+            statusEl.className = 'status-text status-' + type;
+        }
+
+        function hideStatus() {
+            const statusEl = document.getElementById('voiceStatus');
+            statusEl.className = 'status-text';
+        }
+
+        // Parse date from text
+        function parseDate(text) {
+            const textLower = text.toLowerCase();
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            if (textLower.includes('yesterday')) {
+                const yesterday = new Date(today);
+                yesterday.setDate(yesterday.getDate() - 1);
+                return yesterday.toISOString().split('T')[0];
+            } else if (textLower.includes('today')) {
+                return today.toISOString().split('T')[0];
+            } else if (textLower.includes('tomorrow')) {
+                const tomorrow = new Date(today);
+                tomorrow.setDate(tomorrow.getDate() + 1);
+                return tomorrow.toISOString().split('T')[0];
+            }
+
+            // Try to find dates in format YYYY-MM-DD or MM/DD/YYYY
+            const dateMatch = text.match(/\b(\d{4})-(\d{1,2})-(\d{1,2})\b/) || 
+                            text.match(/\b(\d{1,2})\/(\d{1,2})\/(\d{4})\b/);
+            
+            if (dateMatch) {
+                try {
+                    let date;
+                    if (dateMatch[0].includes('-')) {
+                        date = new Date(dateMatch[1], dateMatch[2] - 1, dateMatch[3]);
+                    } else {
+                        date = new Date(dateMatch[3], dateMatch[1] - 1, dateMatch[2]);
+                    }
+                    return date.toISOString().split('T')[0];
+                } catch (e) {
+                    return today.toISOString().split('T')[0];
+                }
+            }
+
+            return today.toISOString().split('T')[0];
+        }
+
+        // Extract entities
+        function extractEntities(text) {
+            const words = text.match(/\b[A-Z][a-zA-Z]*(?:\s+[A-Z][a-zA-Z]*)*/g) || [];
+            const textLower = text.toLowerCase();
+            
+            const people = [];
+            const places = [];
+            const food = [];
+
+            const locationWords = ['restaurant', 'cafe', 'park', 'mall', 'theater', 'store', 'bar', 'hotel'];
+            const foodWords = ['ate', 'ordered', 'had', 'food', 'dish'];
+
+            words.forEach(word => {
+                const wordLower = word.toLowerCase();
+                const wordIndex = textLower.indexOf(wordLower);
+                const nearby = textLower.substring(Math.max(0, wordIndex - 30), 
+                                                   Math.min(textLower.length, wordIndex + wordLower.length + 30));
+
+                if (locationWords.some(kw => nearby.includes(kw))) {
+                    places.push(word);
+                } else if (nearby.includes('with')) {
+                    people.push(word);
+                } else if (foodWords.some(kw => nearby.includes(kw))) {
+                    food.push(word);
+                }
+            });
+
+            return { people, places, food };
+        }
+
+        // Save event
+        function saveEvent() {
+            const description = document.getElementById('eventInput').value.trim();
+            
+            if (!description) {
+                showStatus('⚠️ Please enter or speak an event', 'error');
+                setTimeout(() => hideStatus(), 2000);
+                return;
+            }
+
+            const date = parseDate(description);
+            const { people, places, food } = extractEntities(description);
+
+            const event = {
+                id: Date.now(),
+                description: description,
+                date: date,
+                people: people,
+                places: places,
+                food: food,
+                created: new Date().toISOString()
+            };
+
+            events.unshift(event);
+            localStorage.setItem('events', JSON.stringify(events));
+            
+            document.getElementById('eventInput').value = '';
+            showStatus('✅ Event saved!', 'success');
+            setTimeout(() => hideStatus(), 2000);
+            
+            updateStats();
+            displayEvents(events);
+        }
+
+        // Search events
+        function searchEvents() {
+            const query = document.getElementById('searchInput').value.trim().toLowerCase();
+            
+            if (!query) {
+                displayEvents(events);
+                return;
+            }
+
+            const results = events.filter(event => {
+                // Check description
+                if (event.description.toLowerCase().includes(query)) return true;
+
+                // Check date
+                const queryDate = parseDate(query);
+                if (event.date === queryDate) return true;
+
+                // Check entities
+                return event.people.some(p => p.toLowerCase().includes(query)) ||
+                       event.places.some(p => p.toLowerCase().includes(query)) ||
+                       event.food.some(f => f.toLowerCase().includes(query));
+            });
+
+            displayEvents(results);
+        }
+
+        function showAllEvents() {
+            document.getElementById('searchInput').value = '';
+            displayEvents(events);
+        }
+
+        // Display events
+        function displayEvents(eventsToShow) {
+            const listEl = document.getElementById('eventList');
+            
+            if (eventsToShow.length === 0) {
+                listEl.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">📝</div>
+                        <p>No events found</p>
+                    </div>
+                `;
+                return;
+            }
+
+            listEl.innerHTML = eventsToShow.map(event => `
+                <div class="event-item">
+                    <div class="event-date">📅 ${formatDate(event.date)}</div>
+                    <div class="event-description">${event.description}</div>
+                    <div class="event-tags">
+                        ${event.people.map(p => `<span class="tag tag-person">👤 ${p}</span>`).join('')}
+                        ${event.places.map(p => `<span class="tag tag-place">📍 ${p}</span>`).join('')}
+                        ${event.food.map(f => `<span class="tag tag-food">🍽️ ${f}</span>`).join('')}
+                    </div>
+                    <button class="btn-delete" onclick="deleteEvent(${event.id})">Delete</button>
+                </div>
+            `).join('');
+        }
+
+        // Delete event
+        function deleteEvent(id) {
+            if (confirm('Delete this event?')) {
+                events = events.filter(e => e.id !== id);
+                localStorage.setItem('events', JSON.stringify(events));
+                updateStats();
+                displayEvents(events);
+            }
+        }
+
+        // Format date
+        function formatDate(dateStr) {
+            const date = new Date(dateStr);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            
+            const eventDate = new Date(date);
+            eventDate.setHours(0, 0, 0, 0);
+            
+            const diffDays = Math.ceil((eventDate - today) / (1000 * 60 * 60 * 24));
+            
+            if (diffDays === 0) return 'Today';
+            if (diffDays === -1) return 'Yesterday';
+            if (diffDays === 1) return 'Tomorrow';
+            
+            return date.toLocaleDateString('en-US', { 
+                month: 'short', 
+                day: 'numeric',
+                year: 'numeric'
+            });
+        }
+
+        // Update stats
+        function updateStats() {
+            const today = new Date();
+            const thisMonth = events.filter(e => {
+                const eventDate = new Date(e.date);
+                return eventDate.getMonth() === today.getMonth() && 
+                       eventDate.getFullYear() === today.getFullYear();
+            });
+
+            document.getElementById('totalEvents').textContent = events.length;
+            document.getElementById('monthEvents').textContent = thisMonth.length;
+        }
+
+        // Load events
+        function loadEvents() {
+            const stored = localStorage.getItem('events');
+            if (stored) {
+                events = JSON.parse(stored);
+            }
+            updateStats();
+            displayEvents(events);
+        }
+
+        // Enter key handlers
+        document.getElementById('eventInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                saveEvent();
+            }
+        });
+
+        document.getElementById('searchInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                searchEvents();
+            }
+        });
+
+        // Initialize on load
+        window.addEventListener('load', loadEvents);
+    </script>
+</body>
+</html>
